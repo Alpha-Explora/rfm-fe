@@ -74,47 +74,104 @@ export default function CreditReportView({ report }: Props) {
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <MetricCard
-          icon={TrendingUp}
-          label="Debt-to-Income"
-          value={calculated_metrics.dti}
-          color="blue"
-        />
-        <MetricCard
-          icon={BarChart3}
-          label="Utilization"
-          value={calculated_metrics.utilization}
-          color="purple"
-        />
-        <MetricCard
-          icon={DollarSign}
-          label="Cash Flow Margin"
-          value={calculated_metrics.cash_flow_margin}
-          color="emerald"
-        />
-        <MetricCard
-          icon={ShieldCheck}
-          label="FICO Score"
-          value={calculated_metrics.fico_score.toString()}
-          color="amber"
-        />
-      </div>
+      {calculated_metrics.is_corporate ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <MetricCard
+            icon={TrendingUp}
+            label="DSCR"
+            value={calculated_metrics.dscr || 'N/A'}
+            color="blue"
+          />
+          <MetricCard
+            icon={BarChart3}
+            label="Current Ratio"
+            value={calculated_metrics.current_ratio || 'N/A'}
+            color="purple"
+          />
+          <MetricCard
+            icon={ShieldCheck}
+            label="Debt to Equity"
+            value={calculated_metrics.debt_to_equity || 'N/A'}
+            color="amber"
+          />
+          <MetricCard
+            icon={DollarSign}
+            label="Net Profit Margin"
+            value={calculated_metrics.net_profit_margin || 'N/A'}
+            color="emerald"
+          />
+          <MetricCard
+            icon={TrendingUp}
+            label="Operating Margin"
+            value={calculated_metrics.operating_margin || 'N/A'}
+            color="blue"
+          />
+          <MetricCard
+            icon={ShieldCheck}
+            label="Corporate Score"
+            value={calculated_metrics.fico_score.toString()}
+            color="pink"
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          <MetricCard
+            icon={TrendingUp}
+            label="Debt-to-Income"
+            value={calculated_metrics.dti}
+            color="blue"
+          />
+          <MetricCard
+            icon={BarChart3}
+            label="Utilization"
+            value={calculated_metrics.utilization}
+            color="purple"
+          />
+          <MetricCard
+            icon={DollarSign}
+            label="Cash Flow Margin"
+            value={calculated_metrics.cash_flow_margin}
+            color="emerald"
+          />
+          <MetricCard
+            icon={ShieldCheck}
+            label="FICO Score"
+            value={calculated_metrics.fico_score.toString()}
+            color="amber"
+          />
+        </div>
+      )}
 
-      {/* Customer Summary */}
+      {/* Customer/Corporate Summary */}
       <div className="rounded-xl bg-slate-900/50 border border-slate-800 p-5">
         <div className="flex items-center gap-2 mb-4">
           <DollarSign className="w-4 h-4 text-slate-400" />
-          <h3 className="text-sm font-semibold text-slate-300">Customer Summary</h3>
+          <h3 className="text-sm font-semibold text-slate-300">
+            {calculated_metrics.is_corporate ? 'Corporate Financial Summary' : 'Customer Summary'}
+          </h3>
         </div>
-        <div className="grid grid-cols-2 gap-x-8 gap-y-3">
-          <SummaryRow label="Monthly Income" value={`$${customer_summary.gross_monthly_income.toLocaleString()}`} />
-          <SummaryRow label="Monthly Debt" value={`$${customer_summary.total_monthly_debt_payments.toLocaleString()}`} />
-          <SummaryRow label="Available Credit" value={`$${customer_summary.total_available_credit.toLocaleString()}`} />
-          <SummaryRow label="Outstanding Credit" value={`$${customer_summary.total_outstanding_credit.toLocaleString()}`} />
-          <SummaryRow label="Monthly Expenses" value={`$${customer_summary.total_monthly_expenses.toLocaleString()}`} />
-          <SummaryRow label="Generated" value={new Date(report.report_metadata.generated_at).toLocaleString()} />
-        </div>
+        {calculated_metrics.is_corporate ? (
+          <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+            <SummaryRow label="Annual Revenue" value={customer_summary.revenue ? `$${customer_summary.revenue.toLocaleString()}` : 'N/A'} />
+            <SummaryRow label="EBITDA" value={customer_summary.ebitda ? `$${customer_summary.ebitda.toLocaleString()}` : 'N/A'} />
+            <SummaryRow label="Net Income" value={customer_summary.net_income ? `$${customer_summary.net_income.toLocaleString()}` : 'N/A'} />
+            <SummaryRow label="Current Assets" value={customer_summary.current_assets ? `$${customer_summary.current_assets.toLocaleString()}` : 'N/A'} />
+            <SummaryRow label="Current Liabilities" value={customer_summary.current_liabilities ? `$${customer_summary.current_liabilities.toLocaleString()}` : 'N/A'} />
+            <SummaryRow label="Total Assets" value={customer_summary.total_assets ? `$${customer_summary.total_assets.toLocaleString()}` : 'N/A'} />
+            <SummaryRow label="Total Liabilities" value={customer_summary.total_liabilities ? `$${customer_summary.total_liabilities.toLocaleString()}` : 'N/A'} />
+            <SummaryRow label="Shareholders' Equity" value={customer_summary.equity ? `$${customer_summary.equity.toLocaleString()}` : 'N/A'} />
+            <SummaryRow label="Generated" value={report.report_metadata.generated_at ? new Date(report.report_metadata.generated_at).toLocaleString() : 'N/A'} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+            <SummaryRow label="Monthly Income" value={`$${customer_summary.gross_monthly_income.toLocaleString()}`} />
+            <SummaryRow label="Monthly Debt" value={`$${customer_summary.total_monthly_debt_payments.toLocaleString()}`} />
+            <SummaryRow label="Available Credit" value={`$${customer_summary.total_available_credit.toLocaleString()}`} />
+            <SummaryRow label="Outstanding Credit" value={`$${customer_summary.total_outstanding_credit.toLocaleString()}`} />
+            <SummaryRow label="Monthly Expenses" value={`$${customer_summary.total_monthly_expenses.toLocaleString()}`} />
+            <SummaryRow label="Generated" value={report.report_metadata.generated_at ? new Date(report.report_metadata.generated_at).toLocaleString() : 'N/A'} />
+          </div>
+        )}
       </div>
 
       {/* Models Used */}
